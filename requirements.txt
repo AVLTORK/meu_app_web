@@ -1,2 +1,1 @@
-flask
-selenium
+	text\nFlask\ngunicorn\nrequests\nselenium\n
