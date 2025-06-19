@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Editar Mensagem</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <h1>Editar Mensagem</h1>
+    <form method="POST">
+        <label>Nome:</label><br>
+        <input type="text" name="nome" value="{{ msg.nome }}" required><br><br>
+
+        <label>Mensagem:</label><br>
+        <textarea name="mensagem" required>{{ msg.mensagem }}</textarea><br><br>
+
+        <button type="submit">Salvar Alterações</button>
+    </form>
+    <br>
+    <a href="/admin">Voltar ao Painel</a>
+</body>
+</html>

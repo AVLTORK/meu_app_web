@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Bloqueio de Veículo – Oficina SMHITE</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+  <style>
+    :root{
+      --azul-medio:#3f65a4;--azul-claro:#e8f2ff;--verde:#4caf50;--vermelho:#e53935;--cinza:#d8dee9;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:"Poppins",sans-serif;background:linear-gradient(180deg,var(--azul-claro) 0%,#ffffff 40%);color:#333;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 10px}
+    .card{width:100%;max-width:780px;background:#fff;border-radius:16px;padding:34px 46px;box-shadow:0 8px 20px rgba(0,0,0,.05)}
+    h1{font-size:1.9rem;font-weight:600;color:var(--azul-medio);margin-bottom:26px;text-align:center}
+    form{display:grid;gap:18px}
+    .row{display:flex;gap:18px}
+    .row>.field{flex:1}
+    label{font-weight:500;font-size:.9rem;margin-bottom:4px;display:block}
+    input,select{width:100%;padding:10px 14px;border:1px solid var(--cinza);border-radius:8px;font-size:.9rem;background:#fafbfc}
+    .status{display:flex;gap:18px;align-items:center;margin-top:4px}
+    .actions{display:flex;justify-content:flex-end;gap:14px;margin-top:10px}
+    .btn{border:none;color:#fff;padding:12px 28px;border-radius:8px;font-weight:600;font-size:.9rem;cursor:pointer;transition:background .25s ease}
+    .btn-green{background:var(--verde)}.btn-green:hover{background:#45a047}
+    .btn-red{background:var(--vermelho)}.btn-red:hover{background:#c62828}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1><i class="fa-solid fa-lock"></i> Bloqueio de Veículo</h1>
+
+    <form onsubmit="return false;">
+      <div class="row">
+        <div class="field">
+          <label>Cliente</label>
+          <input type="text" placeholder="Nome completo" />
+        </div>
+        <div class="field">
+          <label>Veículo</label>
+          <input type="text" placeholder="Marca / Modelo" />
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label>Placa</label>
+          <input type="text" placeholder="ABC1D23" />
+        </div>
+        <div class="field">
+          <label>Chip (número)</label>
+          <input type="text" placeholder="(99) 99999‑9999" />
+        </div>
+        <div class="field">
+          <label>Operadora</label>
+          <select>
+            <option>Claro</option><option>Vivo</option><option>Tim</option><option>Oi</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label>Dispositivo rastreador</label>
+          <input type="text" placeholder="MTC-300" />
+        </div>
+        <div class="field">
+          <label>IMEI / Série</label>
+          <input type="text" placeholder="123456789012345" />
+        </div>
+        <div class="field">
+          <label>Data Instalação</label>
+          <input type="date" />
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label>Status do Bloqueio</label>
+          <select>
+            <option>Ativo</option>
+            <option>Inativo</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Última ação</label>
+          <input type="datetime-local" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Observações</label>
+        <input type="text" placeholder="Detalhes adicionais sobre o bloqueio…" />
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-red" type="button">Bloquear</button>
+        <button class="btn btn-green" type="button">Desbloquear</button>
+        <button class="btn btn-green" type="submit">Salvar</button>
+      </div>
+    </form>
+  </div>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Painel Admin</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <h1>Painel de Administração</h1>
+
+    <form method="GET" action="/admin">
+        <input type="text" name="busca" placeholder="Buscar..." value="{{ busca }}">
+        <button type="submit">Buscar</button>
+    </form>
+
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Mensagem</th>
+            <th>Ações</th>
+        </tr>
+        {% for msg in mensagens %}
+        <tr>
+            <td>{{ msg.id }}</td>
+            <td>{{ msg.nome }}</td>
+            <td>{{ msg.mensagem }}</td>
+            <td>
+                <a href="/editar/{{ msg.id }}">Editar</a> |
+                <a href="/excluir/{{ msg.id }}">Excluir</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br>
+    <div>
+        {% if pagina > 1 %}
+            <a href="/admin?busca={{ busca }}&pagina={{ pagina -1 }}">Página Anterior</a>
+        {% endif %}
+        Página {{ pagina }} de {{ total_paginas }}
+        {% if pagina < total_paginas %}
+            <a href="/admin?busca={{ busca }}&pagina={{ pagina +1 }}">Próxima Página</a>
+        {% endif %}
+    </div>
+
+    <br>
+    <a href="/exportar">Exportar CSV</a> |
+    <a href="/logout">Sair</a> |
+    <a href="/">Voltar ao Início</a>
+</body>
+</html>

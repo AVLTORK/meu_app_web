@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Rastreamento – Oficina SMHITE</title>
+
+  <!-- Poppins + Font Awesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+
+  <style>
+    :root{ --azul:#3f65a4; --cinza:#d8dee9; --verde:#4caf50; }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      font-family:"Poppins",sans-serif;
+      background:linear-gradient(180deg,#e8f2ff 0%,#ffffff 40%);
+      min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 10px;
+    }
+    .card{width:100%;max-width:720px;background:#fff;border-radius:16px;padding:34px 46px;box-shadow:0 8px 18px rgba(0,0,0,.05)}
+    h1{font-size:1.8rem;font-weight:600;color:var(--azul);margin-bottom:24px;text-align:center}
+
+    form{display:grid;gap:18px}
+    .row{display:flex;gap:18px}.row>.field{flex:1}
+    label{font-weight:500;font-size:.9rem;margin-bottom:4px;display:block}
+    input{width:100%;padding:10px 14px;border:1px solid var(--cinza);border-radius:8px;font-size:.9rem;background:#fafbfc}
+    .actions{display:flex;justify-content:flex-end;gap:16px;margin-top:4px}
+
+    .btn{background:var(--verde);color:#fff;border:none;padding:11px 28px;border-radius:8px;font-weight:600;cursor:pointer;transition:background .25s ease}
+    .btn:hover{background:#45a047}
+
+    /* Link Maps exibido */
+    #mapsLink{margin-top:14px;display:none;font-size:.9rem}
+    #mapsLink a{color:var(--azul);font-weight:600;text-decoration:none}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1><i class="fa-solid fa-location-dot"></i> Rastreamento de Veículo</h1>
+
+    <form onsubmit="return false;">
+      <div class="row">
+        <div class="field">
+          <label>Placa</label>
+          <input type="text" id="placa" placeholder="ABC1D23" />
+        </div>
+        <div class="field">
+          <label>Veículo</label>
+          <input type="text" id="veiculo" placeholder="(preenchido)" />
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label>Latitude</label>
+          <input type="text" id="lat" placeholder="-29.123456" />
+        </div>
+        <div class="field">
+          <label>Longitude</label>
+          <input type="text" id="lng" placeholder="-51.987654" />
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn" onclick="gerarMapa()">Visualizar no Maps</button>
+      </div>
+    </form>
+
+    <!-- link gerado -->
+    <div id="mapsLink">Abrir no Google Maps: <a id="mapsA" target="_blank">Ver rota</a></div>
+  </div>
+
+  <script>
+    function gerarMapa(){
+      const lat = document.getElementById('lat').value.trim();
+      const lng = document.getElementById('lng').value.trim();
+      if(!lat || !lng){ alert('Informe latitude e longitude'); return; }
+      const url = `https://www.google.com/maps?q=${lat},${lng}`;
+      const link= document.getElementById('mapsA');
+      link.href  = url;
+      link.textContent = url;
+      document.getElementById('mapsLink').style.display='block';
+    }
+  </script>
+</body>
+</html>
