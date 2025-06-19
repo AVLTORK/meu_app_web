@@ -14,6 +14,27 @@ def get_db_connection():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
+# ------------------- Páginas Estáticas do Front -------------------
+@app.route("/")
+def home():
+    return render_template("index.html")
+
+@app.route("/rastreamento")
+def rastreamento():
+    return render_template("rastreamento.html")
+
+@app.route("/bloqueio")
+def bloqueio():
+    return render_template("bloqueio.html")
+
+@app.route("/consulta")
+def consulta():
+    return render_template("consulta.html")
+
+@app.route("/orcamento")
+def orcamento():
+    return render_template("orcamento.html")
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
