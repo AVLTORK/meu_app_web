@@ -1,1 +1,4 @@
-	text\nFlask\ngunicorn\nrequests\nselenium\n
+Flask==3.0.2
+gunicorn==21.2.0
+requests==2.31.0
+selenium==4.20.0
