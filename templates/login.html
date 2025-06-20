@@ -1,19 +1,33 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
-    <title>Login</title>
-    <link rel="stylesheet" href="/static/css/style.css">
+  <meta charset="UTF-8">
+  <title>Login – Oficina SMHITE</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root{
+      --azul-medio:#3f65a4;--verde:#4caf50;--cinza-borda:#d8dee9;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Poppins,sans-serif;background:#e8f2ff;height:100vh;display:flex;justify-content:center;align-items:center}
+    form{background:#fff;padding:36px 42px;border-radius:14px;box-shadow:0 8px 18px rgba(0,0,0,.06);width:320px}
+    h1{font-size:1.4rem;color:var(--azul-medio);text-align:center;margin-bottom:24px}
+    label{font-weight:600;font-size:.85rem;display:block;margin-bottom:6px}
+    input{width:100%;padding:10px;border:1px solid var(--cinza-borda);border-radius:8px;margin-bottom:14px;font-size:.9rem}
+    .btn{width:100%;padding:11px;border:none;border-radius:8px;background:var(--verde);color:#fff;font-weight:600;cursor:pointer;transition:background .25s ease}
+    .btn:hover{background:#45a047}
+    .msg{color:#e53935;text-align:center;margin-bottom:8px}
+  </style>
 </head>
 <body>
-    <h1>Login do Administrador</h1>
-    <form method="POST">
-        <label>Usuário:</label><br>
-        <input type="text" name="usuario" required><br><br>
-
-        <label>Senha:</label><br>
-        <input type="password" name="senha" required><br><br>
-
-        <button type="submit">Entrar</button>
-    </form>
+  <form method="POST">
+    <h1>Entrar</h1>
+    {% if msg %}<div class="msg">{{ msg }}</div>{% endif %}
+    <label>Usuário</label>
+    <input name="user" autocomplete="username" required>
+    <label>Senha</label>
+    <input type="password" name="pwd" autocomplete="current-password" required>
+    <button class="btn" type="submit">Login</button>
+  </form>
 </body>
 </html>

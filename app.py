@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session, send_file
+import os
 import sqlite3
 import csv
 from selenium import webdriver
@@ -7,18 +8,49 @@ from selenium.webdriver.common.by import By
 import time
 
 app = Flask(__name__)
-app.secret_key = 'sua_chave_secreta'
-DB_PATH = 'mensagens.db'
+app.secret_key = os.getenv("SECRET_KEY", "minha_chave_secreta_troque_depois")  # Chave de sessão
 
+DB_PATH = 'mensagens.db'
+USERS = {"Lucia": "1234"}  # Usuário e senha temporários
+
+# Proteção de todas as rotas (exceto login e static)
+@app.before_request
+def proteger_todas_as_rotas():
+    rotas_livres = ("/login", "/static/")
+    if not session.get("user") and not request.path.startswith(rotas_livres):
+        return redirect(url_for("login"))
+
+# Rota de login
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    msg = ""
+    if request.method == "POST":
+        usuario = request.form["user"]
+        senha = request.form["pwd"]
+        if USERS.get(usuario) == senha:
+            session["user"] = usuario
+            return redirect(url_for("home"))
+        msg = "Usuário ou senha inválidos"
+    return render_template("login.html", msg=msg)
+
+# Logout
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("login"))
+
+# Conexão com banco
 def get_db_connection():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
-# ------------------- Páginas Estáticas do Front -------------------
+
+# Página principal
 @app.route("/")
 def home():
     return render_template("index.html")
 
+# Demais páginas protegidas
 @app.route("/rastreamento")
 def rastreamento():
     return render_template("rastreamento.html")
@@ -35,44 +67,8 @@ def consulta():
 def orcamento():
     return render_template("orcamento.html")
 
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        usuario = request.form['usuario']
-        senha = request.form['senha']
-        if usuario == 'admin' and senha == '1234':
-            session['logado'] = True
-            return redirect(url_for('admin'))
-        else:
-            return 'Login inválido'
-    return render_template('login.html')
-
-@app.route('/logout')
-def logout():
-    session.pop('logado', None)
-    return redirect(url_for('login'))
-
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-@app.route('/enviar', methods=['POST'])
-def enviar():
-    nome = request.form['nome']
-    mensagem = request.form['mensagem']
-    conn = get_db_connection()
-    conn.execute('INSERT INTO mensagens (nome, mensagem) VALUES (?, ?)', (nome, mensagem))
-    conn.commit()
-    conn.close()
-    enviar_whatsapp(nome, mensagem)
-    return redirect(url_for('index'))
-
-@app.route('/admin')
+@app.route("/admin")
 def admin():
-    if not session.get('logado'):
-        return redirect(url_for('login'))
-
     busca = request.args.get('busca', '')
     pagina = int(request.args.get('pagina', 1))
     por_pagina = 5
@@ -91,23 +87,29 @@ def admin():
 
     return render_template('admin.html', mensagens=mensagens, busca=busca, pagina=pagina, total_paginas=total_paginas)
 
-@app.route('/excluir/<int:id>')
+@app.route("/enviar", methods=["POST"])
+def enviar():
+    nome = request.form['nome']
+    mensagem = request.form['mensagem']
+    conn = get_db_connection()
+    conn.execute('INSERT INTO mensagens (nome, mensagem) VALUES (?, ?)', (nome, mensagem))
+    conn.commit()
+    conn.close()
+    enviar_whatsapp(nome, mensagem)
+    return redirect(url_for('home'))
+
+@app.route("/excluir/<int:id>")
 def excluir(id):
-    if not session.get('logado'):
-        return redirect(url_for('login'))
     conn = get_db_connection()
     conn.execute('DELETE FROM mensagens WHERE id = ?', (id,))
     conn.commit()
     conn.close()
     return redirect(url_for('admin'))
 
-@app.route('/editar/<int:id>', methods=['GET', 'POST'])
+@app.route("/editar/<int:id>", methods=["GET", "POST"])
 def editar(id):
-    if not session.get('logado'):
-        return redirect(url_for('login'))
-
     conn = get_db_connection()
-    if request.method == 'POST':
+    if request.method == "POST":
         novo_nome = request.form['nome']
         nova_msg = request.form['mensagem']
         conn.execute('UPDATE mensagens SET nome = ?, mensagem = ? WHERE id = ?', (novo_nome, nova_msg, id))
@@ -119,11 +121,8 @@ def editar(id):
         conn.close()
         return render_template('editar.html', msg=msg)
 
-@app.route('/exportar')
+@app.route("/exportar")
 def exportar():
-    if not session.get('logado'):
-        return redirect(url_for('login'))
-
     conn = get_db_connection()
     mensagens = conn.execute('SELECT * FROM mensagens').fetchall()
     conn.close()
@@ -136,6 +135,7 @@ def exportar():
 
     return send_file('mensagens.csv', as_attachment=True)
 
+# Função WhatsApp
 def enviar_whatsapp(nome, mensagem):
     try:
         chrome_service = Service('chromedriver.exe')
@@ -152,7 +152,7 @@ def enviar_whatsapp(nome, mensagem):
         driver.get(f'https://web.whatsapp.com/send?phone={numero_destino}&text={texto}')
         time.sleep(10)
 
-        botao = driver.find_element(By.XPATH, '//span[@data-icon="send"]')
+        botao = driver.find_element(By.XPATH, '//span[@data-icon=\"send\"]')
         botao.click()
         time.sleep(5)
         driver.quit()
