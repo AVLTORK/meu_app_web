@@ -1,4 +1,13 @@
 Flask==3.0.2
 gunicorn==21.2.0
-requests==2.31.0
+
+# Google Drive / OAuth
+google-api-python-client==2.127.0
+google-auth==2.29.0
+google-auth-oauthlib==1.2.0
+google-auth-httplib2==0.2.0
+
+# Outras dependências do app
 selenium==4.20.0
+requests==2.31.0
+reportlab==4.1.0
