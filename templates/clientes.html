@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Clientes – Oficina SMHITE</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f2f4f8; padding: 20px; }
+        h1 { color: #3f65a4; }
+        .btn-novo, .btn-export { margin-right: 10px; padding: 8px 14px; background: #4caf50; color: white; border-radius: 6px; text-decoration: none; }
+        .btn-novo:hover, .btn-export:hover { background: #45a047; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background: #3f65a4; color: white; }
+        .paginacao a { margin: 0 8px; text-decoration: none; }
+    </style>
+</head>
+<body>
+
+    <h1>Lista de Clientes</h1>
+
+    <!-- Busca -->
+    <form method="get" action="{{ url_for('clientes') }}" style="margin-bottom: 20px;">
+        <input type="text" name="busca" placeholder="Buscar por nome ou placa..." value="{{ busca }}" style="padding: 8px; width: 250px;">
+        <button type="submit" style="padding: 8px 12px;">🔍 Buscar</button>
+    </form>
+
+    <!-- Botões -->
+    <a class="btn-novo" href="{{ url_for('novo_cliente') }}">+ Novo Cliente</a>
+    <a class="btn-export" href="{{ url_for('exportar_todos_clientes_pdf') }}">📄 Exportar PDF Geral</a>
+    <a class="btn-export" href="{{ url_for('exportar_clientes') }}">🗂️ Exportar CSV Geral</a>
+    <a class="btn-export" href="{{ url_for('exportar_clientes_pdf_filtrado', busca=busca) }}">🔎 Exportar PDF Filtrado</a>
+    <a class="btn-export" href="{{ url_for('exportar_clientes_filtrados', busca=busca) }}">🔎 Exportar CSV Filtrado</a>
+    <a class="btn-export" href="{{ url_for('relatorios_clientes') }}">📊 Relatórios</a>
+
+    <!-- Tabela -->
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Telefone</th>
+            <th>Placa</th>
+            <th>Ações</th>
+        </tr>
+        {% for cliente in clientes %}
+        <tr>
+            <td>{{ cliente["id"] }}</td>
+            <td>{{ cliente["nome"] }}</td>
+            <td>{{ cliente["telefone"] }}</td>
+            <td>{{ cliente["placa"] }}</td>
+            <td>
+                <a href="{{ url_for('visualizar_cliente', id=cliente['id']) }}">👁️ Ver</a> |
+                <a href="{{ url_for('editar_cliente', id=cliente['id']) }}">✏️ Editar</a> |
+                <a href="{{ url_for('excluir_cliente', id=cliente['id']) }}" onclick="return confirm('Excluir este cliente?')">❌ Excluir</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <!-- Paginação -->
+    <div class="paginacao" style="margin-top: 20px;">
+        {% if pagina > 1 %}
+            <a href="{{ url_for('clientes', pagina=pagina-1, busca=busca) }}">⬅️ Anterior</a>
+        {% endif %}
+
+        <span>Página {{ pagina }} de {{ total_paginas }}</span>
+
+        {% if pagina < total_paginas %}
+            <a href="{{ url_for('clientes', pagina=pagina+1, busca=busca) }}">Próxima ➡️</a>
+        {% endif %}
+    </div>
+
+</body>
+</html>

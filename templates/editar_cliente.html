@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Cliente – Oficina SMHITE</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f2f4f8; padding: 20px; }
+        h1 { color: #3f65a4; }
+        label { display: block; margin-top: 12px; }
+        input, textarea { width: 100%; padding: 8px; margin-top: 4px; border-radius: 6px; border: 1px solid #ccc; }
+        button { margin-top: 20px; padding: 10px 16px; background: #4caf50; color: white; border: none; border-radius: 6px; cursor: pointer; }
+        button:hover { background: #45a047; }
+        .photos-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-top: 20px; }
+        .photo-card { border: 2px dashed #c4cbdc; border-radius: 10px; padding: 10px; text-align: center; background: #fff; }
+        img { width: 100%; height: 100px; object-fit: cover; border-radius: 6px; margin-top: 6px; }
+        a { display: inline-block; margin-top: 20px; color: #3f65a4; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <h1>Editar Cliente: {{ cliente['nome'] }}</h1>
+
+    <form method="post" enctype="multipart/form-data">
+        <label>Nome:</label>
+        <input type="text" name="nome" value="{{ cliente['nome'] }}" required>
+
+        <label>Telefone:</label>
+        <input type="text" name="telefone" value="{{ cliente['telefone'] }}" required>
+
+        <label>Placa:</label>
+        <input type="text" name="placa" value="{{ cliente['placa'] }}">
+
+        <label>Endereço:</label>
+        <input type="text" name="endereco" value="{{ cliente['endereco'] }}">
+
+        <label>Email:</label>
+        <input type="email" name="email" value="{{ cliente['email'] }}">
+
+        <h3>Fotos:</h3>
+        <div class="photos-grid">
+            {% for campo, label in {
+                'foto_placa':'Placa',
+                'foto_dianteira':'Dianteira',
+                'foto_traseira':'Traseira',
+                'foto_lado_esq':'Lado Esquerdo',
+                'foto_lado_dir':'Lado Direito',
+                'foto_dano':'Dano/Defeito'
+            }.items() %}
+                <div class="photo-card">
+                    <label>{{ label }}</label>
+                    {% if cliente[campo] %}
+                        <img src="{{ cliente[campo] }}" alt="{{ label }}">
+                    {% else %}
+                        <span>Sem imagem</span>
+                    {% endif %}
+                    <input type="file" name="{{ campo }}" accept="image/*">
+                </div>
+            {% endfor %}
+        </div>
+
+        <button type="submit">Salvar Alterações</button>
+    </form>
+
+    <a href="{{ url_for('clientes') }}">← Voltar para Lista</a>
+
+</body>
+</html>

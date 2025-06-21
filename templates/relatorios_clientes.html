@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Relatórios – Oficina SMHITE</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f2f4f8; padding: 20px; }
+        h1 { color: #3f65a4; }
+        .box { background: #fff; padding: 18px; border-radius: 8px; margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .box strong { color: #333; }
+        a { display: inline-block; margin-top: 20px; color: #3f65a4; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <h1>📊 Relatórios de Clientes</h1>
+
+    <div class="box"><strong>Total de clientes cadastrados:</strong> {{ total_clientes }}</div>
+    <div class="box"><strong>Clientes com placa informada:</strong> {{ total_com_placa }}</div>
+    <div class="box"><strong>Clientes com e-mail cadastrado:</strong> {{ total_com_email }}</div>
+    <div class="box"><strong>Clientes com pelo menos uma foto:</strong> {{ total_fotos }}</div>
+
+    <a href="{{ url_for('clientes') }}">← Voltar para Lista de Clientes</a>
+
+</body>
+</html>

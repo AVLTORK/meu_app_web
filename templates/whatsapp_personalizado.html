@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>WhatsApp Personalizado – Oficina SMHITE</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f9fafa; padding: 20px; }
+        h1 { color: #3f65a4; }
+        textarea { width: 100%; height: 120px; padding: 8px; border-radius: 6px; border: 1px solid #ccc; }
+        button { margin-top: 15px; padding: 10px 16px; background: #4caf50; color: white; border: none; border-radius: 6px; cursor: pointer; }
+        button:hover { background: #45a047; }
+        a { display: inline-block; margin-top: 20px; color: #3f65a4; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <h1>Enviar WhatsApp para {{ cliente['nome'] }}</h1>
+
+    <form method="post">
+        <label>Mensagem personalizada:</label>
+        <textarea name="mensagem">Olá {{ cliente['nome'] }}, estamos entrando em contato pela Oficina SMHITE.</textarea>
+        <button type="submit">📲 Enviar WhatsApp</button>
+    </form>
+
+    <a href="{{ url_for('visualizar_cliente', id=cliente['id']) }}">← Voltar para Detalhes do Cliente</a>
+
+</body>
+</html>

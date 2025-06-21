@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalhes do Cliente – Oficina SMHITE</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f0f2f5; padding: 20px; }
+        h1 { color: #3f65a4; }
+        .info { margin-bottom: 8px; }
+        .fotos { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+        .fotos img { width: 120px; height: 80px; object-fit: cover; border-radius: 6px; }
+        .fotos a { text-decoration: none; }
+        .btn { display: inline-block; margin-top: 10px; padding: 10px 14px; background: #4caf50; color: white; border-radius: 6px; text-decoration: none; margin-right: 8px; }
+        .btn:hover { background: #45a047; }
+    </style>
+</head>
+<body>
+
+    <h1>Cliente: {{ cliente['nome'] }}</h1>
+
+    <div class="info"><strong>Telefone:</strong> {{ cliente['telefone'] }}</div>
+    <div class="info"><strong>Placa:</strong> {{ cliente['placa'] }}</div>
+    <div class="info"><strong>Endereço:</strong> {{ cliente['endereco'] }}</div>
+    <div class="info"><strong>Email:</strong> {{ cliente['email'] }}</div>
+
+    <h3>Fotos:</h3>
+    <div class="fotos">
+        {% for campo, label in {
+            'foto_placa':'Placa',
+            'foto_dianteira':'Dianteira',
+            'foto_traseira':'Traseira',
+            'foto_lado_esq':'Lado Esquerdo',
+            'foto_lado_dir':'Lado Direito',
+            'foto_dano':'Dano/Defeito'
+        }.items() %}
+            {% if cliente[campo] %}
+                <a href="{{ cliente[campo] }}" target="_blank" title="{{ label }}">
+                    <img src="{{ cliente[campo] }}" alt="{{ label }}">
+                </a>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <h3>Ações:</h3>
+    <a class="btn" href="{{ url_for('exportar_fotos_zip', id=cliente['id']) }}">⬇️ Baixar ZIP das Fotos</a>
+
+    {% if cliente['pasta_drive'] %}
+        <a class="btn" href="https://drive.google.com/drive/folders/{{ cliente['pasta_drive'] }}" target="_blank">📂 Abrir Pasta no Drive</a>
+    {% endif %}
+
+    <a class="btn" href="{{ url_for('enviar_whatsapp_cliente', id=cliente['id']) }}">📲 WhatsApp Rápido</a>
+    <a class="btn" href="{{ url_for('whatsapp_personalizado', id=cliente['id']) }}">📝 WhatsApp Personalizado</a>
+    <a class="btn" href="{{ url_for('clientes') }}">← Voltar</a>
+
+</body>
+</html>

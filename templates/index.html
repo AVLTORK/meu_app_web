@@ -3,9 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>Página Inicial – Oficina SMHITE</title>
+
+    <!-- Google Fonts e Font Awesome -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <!-- Font Awesome para ícones monocromáticos -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Estilos (iguais aos que você já tinha) -->
     <style>
         :root{
             --azul-escuro:#324f7b;--azul-medio:#3f65a4;--azul-claro:#e8f2ff;
@@ -14,50 +17,47 @@
         }
         *{box-sizing:border-box;margin:0;padding:0}
         body{font-family:"Poppins",Arial,Helvetica,sans-serif;background:linear-gradient(180deg,var(--cinza-claro)0%,var(--azul-claro)100%);color:#333;min-height:100vh;display:flex;flex-direction:column}
-        /* ----- NAV BAR ----- */
-        nav{
-            background:rgba(50,79,123,.85); /* azul escuro com transparência */
-            backdrop-filter:blur(6px);
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            padding:12px 5%;
-            border-bottom:1px solid rgba(255,255,255,.15);
-            box-shadow:0 1px 3px rgba(0,0,0,.05);
-            border-radius:0 0 14px 14px; /* cantos suaves na base */
-        }
-        .nav-links{display:flex;gap:24px}.nav-links a{color:#fff;text-decoration:none;font-weight:500;padding:6px 14px;border-radius:6px;transition:background .25s ease}.nav-links a:hover{background:rgba(255,255,255,.15)}
+        nav{background:rgba(50,79,123,.85);backdrop-filter:blur(6px);display:flex;justify-content:space-between;align-items:center;padding:12px 5%;border-bottom:1px solid rgba(255,255,255,.15);box-shadow:0 1px 3px rgba(0,0,0,.05);border-radius:0 0 14px 14px}
+        .nav-links{display:flex;gap:24px}
+        .nav-links a{color:#fff;text-decoration:none;font-weight:500;padding:6px 14px;border-radius:6px;transition:background .25s ease}
+        .nav-links a:hover{background:rgba(255,255,255,.15)}
         .nav-icons{display:flex;gap:18px}
         .icon-btn{background:none;border:none;color:#fff;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:6px;border-radius:8px;transition:background .25s ease,transform .15s ease}
-        .icon-btn:hover{background:rgba(255,255,255,.12);transform:scale(1.15)}.icon-btn:hover{transform:scale(1.15)}
-        /* ---------- Ações ---------- */
+        .icon-btn:hover{background:rgba(255,255,255,.12);transform:scale(1.15)}
+
         .left-actions,.top-actions,.sub-actions{display:flex;gap:12px;padding:12px 5%;flex-wrap:wrap}
-        .top-actions{flex-direction:column;align-items:flex-end}
-        .left-actions{display:flex;flex-direction:column;align-items:flex-start;gap:12px;padding:12px 5% 0 5%}
-        .top-actions,.sub-actions{justify-content:flex-end}
-        button{border:none;padding:8px 18px;border-radius:8px;font-weight:500;cursor:pointer;transition:background .25s ease,transform .15s ease;font-size:.9rem;display:flex;align-items:center;gap:6px}
-        .left-btn{background:var(--azul-medio);color:#fff;padding:12px 60px;border-radius:8px;font-weight:600;font-size:1rem;cursor:pointer;transition:background .25s ease,transform .15s ease;display:flex;align-items:center;gap:6px}
-        .left-btn:hover{background:#35578f}.left-btn:active{transform:scale(.97)}
-        .action-btn{background:var(--roxo);color:#fff;padding:12px 60px;border-radius:8px;font-weight:600;font-size:1rem;cursor:pointer;transition:background .25s ease,transform .15s ease;display:flex;align-items:center;gap:6px}.action-btn:hover{background:#6a50e6}.action-btn:active{transform:scale(.97)}
-        .sub-btn{background:var(--cinza);color:#333}.sub-btn:hover{background:var(--cinza-hover)}.sub-btn:active{transform:scale(.97)}
-        .sub-btn::before{content:"\1F512";font-size:.8em;color:var(--amarelo-suave)}
-        /* ---------- Conteúdo ---------- */
+        .left-actions{flex-direction:column;align-items:flex-start;padding:12px 5% 0 5%}
+        button,a.left-btn{border:none;padding:12px 60px;border-radius:8px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;font-size:1rem;transition:background .25s ease,transform .15s ease}
+        .left-btn{background:var(--azul-medio);color:#fff}.left-btn:hover{background:#35578f}.left-btn:active{transform:scale(.97)}
+
+        .sub-actions{justify-content:flex-end}
+        .sub-btn{background:var(--cinza);color:#333;padding:8px 18px;font-weight:500;border-radius:8px}.sub-btn:hover{background:var(--cinza-hover)}
+
         .container{flex:1;width:90%;max-width:1150px;margin:32px auto;background:#fff;border-radius:18px;box-shadow:0 8px 20px rgba(0,0,0,.05);padding:32px 40px}
         h2{font-weight:600;color:var(--azul-medio);margin-bottom:24px}
         .carros{display:flex;flex-wrap:wrap;gap:24px;justify-content:center}
         .carro{width:220px;height:110px;background:linear-gradient(135deg,#fff 0%,var(--cinza)100%);border:1px solid var(--cinza);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:.9rem;color:#555;box-shadow:0 4px 8px rgba(0,0,0,.05);transition:transform .25s ease,box-shadow .25s ease}
         .carro:hover{transform:translateY(-4px);box-shadow:0 8px 16px rgba(0,0,0,.08)}
-        .btn{background:var(--verde);color:#fff;border:none;padding:10px 22px;border-radius:8px;font-weight:500;cursor:pointer;transition:background .25s ease,transform .15s ease;margin:16px 8px 0 8px}.btn:hover{background:#45a047}.btn:active{transform:scale(.97)}
-        /* WhatsApp fixo */
-        .wa-btn{position:fixed;bottom:20px;left:20px;background:var(--verde);color:#fff;border:none;padding:12px 24px;border-radius:50px;font-weight:600;box-shadow:0 4px 10px rgba(0,0,0,.1);cursor:pointer;transition:background .25s ease,transform .15s ease;font-size:.9rem;z-index:1000;display:flex;align-items:center;gap:6px}.wa-btn:hover{background:#45a047}.wa-btn:active{transform:scale(.97)}
-        @media(max-width:600px){.container{padding:24px 20px}.carro{width:160px;height:90px}.top-actions,.sub-actions{justify-content:center;padding:12px 20px}}
-    .accounts-box{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:4px 5% 0 5%}
-        .account-box{background:var(--azul-medio);color:#fff;padding:12px 60px;border-radius:8px;font-weight:600;font-size:1rem;cursor:default;display:flex;align-items:center;gap:6px}
+        .btn{background:var(--verde);color:#fff;border:none;padding:10px 22px;border-radius:8px;font-weight:500;cursor:pointer;margin:16px 8px 0 8px}.btn:hover{background:#45a047}.btn:active{transform:scale(.97)}
+
+        .wa-btn{position:fixed;bottom:20px;left:20px;background:var(--verde);color:#fff;border:none;padding:12px 24px;border-radius:50px;font-weight:600;box-shadow:0 4px 10px rgba(0,0,0,.1);cursor:pointer;font-size:.9rem;z-index:1000;display:flex;align-items:center;gap:6px}.wa-btn:hover{background:#45a047}
+
+        .accounts-box{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:4px 5% 0 5%}
+        .account-box{background:var(--azul-medio);color:#fff;padding:12px 60px;border-radius:8px;font-weight:600;font-size:1rem}
     </style>
 </head>
 <body>
+
+    <!-- NAVBAR -->
     <nav>
-        <div class="nav-links"><a href="#">Home</a><a href="#">Clientes</a><a href="#">Movimentação</a><a href="#">Histórico</a><a href="#">Agendamentos</a></div>
+        <div class="nav-links">
+            <a href="{{ url_for('home') }}">Home</a>
+            <a href="{{ url_for('clientes') }}">Clientes</a>
+            <a href="#">Movimentação</a>
+            <a href="#">Histórico</a>
+            <a href="#">Agendamentos</a>
+        </div>
+
         <div class="nav-icons">
             <button class="icon-btn" title="Notificações"><i class="fa-solid fa-bell"></i></button>
             <button class="icon-btn" title="Login"><i class="fa-solid fa-user"></i></button>
@@ -66,29 +66,48 @@
         </div>
     </nav>
 
-    <!-- Novos botões à esquerda -->
+    <!-- BOTÕES ESQUERDA -->
     <div class="left-actions">
-       <a class="left-btn" href="/rastreamento">Rastreamento</a>
-       <a class="left-btn" href="/bloqueio">Bloqueio</a>
-       <a class="left-btn" href="/consulta">Consulta de Peças</a>
-       <a class="left-btn" href="/orcamento">Criar Novo Orçamento</a>
+        <a class="left-btn" href="{{ url_for('rastreamento') }}">Rastreamento</a>
+        <a class="left-btn" href="{{ url_for('bloqueio') }}">Bloqueio</a>
+        <a class="left-btn" href="{{ url_for('consulta') }}">Consulta de Peças</a>
+        <a class="left-btn" href="{{ url_for('orcamento') }}">Criar Novo Orçamento</a>
     </div>
 
-    <!-- Quadros Contas -->
+    <!-- CONTAS -->
     <div class="accounts-box">
-        <div class="account-box">Contas a Receber <span style="color:#4caf50;font-weight:700;margin-left:6px;">R$ 0,00</span></div>
-        <div class="account-box">Contas a Pagar <span style="color:#ff5e5e;font-weight:700;margin-left:6px;">R$ 0,00</span></div>
+        <div class="account-box">Contas a Receber <span style="color:#4caf50;font-weight:700;margin-left:6px;">R$ 0,00</span></div>
+        <div class="account-box">Contas a Pagar <span style="color:#ff5e5e;font-weight:700;margin-left:6px;">R$ 0,00</span></div>
     </div>
 
-    
-    <div class="sub-actions"><button class="sub-btn" type="button">Danos</button><button class="sub-btn" type="button">Acessórios</button><button class="sub-btn" type="button">Serviços Solicitados</button><button class="sub-btn" type="button">Checklist Rápido</button><button class="sub-btn" type="button">Itens Complementares</button><button class="sub-btn" type="button">Serviços Futuros</button></div>
+    <!-- SUB AÇÕES -->
+    <div class="sub-actions">
+        <button class="sub-btn" type="button">Danos</button>
+        <button class="sub-btn" type="button">Acessórios</button>
+        <button class="sub-btn" type="button">Serviços Solicitados</button>
+        <button class="sub-btn" type="button">Checklist Rápido</button>
+        <button class="sub-btn" type="button">Itens Complementares</button>
+        <button class="sub-btn" type="button">Serviços Futuros</button>
+    </div>
 
+    <!-- CONTEÚDO CENTRAL -->
     <main class="container">
-        <h2>Check‑list de Veículo</h2>
-        <section class="carros"><div class="carro">Imagem 1</div><div class="carro">Imagem 2</div><div class="carro">Imagem 3</div><div class="carro">Imagem 4</div></section>
-        <div style="text-align:center;"><button class="btn" type="button">Enviar e‑mail</button><button class="btn" type="button">Imprimir</button><button class="btn" type="button">Voltar</button></div>
+        <h2>Check-list de Veículo</h2>
+        <section class="carros">
+            <div class="carro">Imagem 1</div>
+            <div class="carro">Imagem 2</div>
+            <div class="carro">Imagem 3</div>
+            <div class="carro">Imagem 4</div>
+        </section>
+        <div style="text-align:center;">
+            <button class="btn" type="button">Enviar e-mail</button>
+            <button class="btn" type="button">Imprimir</button>
+            <button class="btn" type="button">Voltar</button>
+        </div>
     </main>
 
-    <button class="wa-btn" type="button">Enviar Watzap</button>
+    <!-- BOTÃO WHATSAPP -->
+    <button class="wa-btn" type="button">Enviar WhatsApp</button>
+
 </body>
 </html>
