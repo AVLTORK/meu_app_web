@@ -1,344 +1,84 @@
-from dotenv import load_dotenv
-load_dotenv()
+"""
+app.py — Flask + Firebase Realtime Database
+Coloque serviceAccountKey.json na raiz do projeto.
+"""
 
-from flask import Flask, render_template, request, redirect, url_for, session, flash, send_file
-import os, sqlite3, secrets, csv, time, zipfile, requests
-from werkzeug.utils import secure_filename
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.by import By
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
+from flask import Flask, render_template, request, redirect, url_for
+import firebase_admin
+from firebase_admin import credentials, db
 
-from firebase_admin import credentials, storage, initialize_app
+# ─────────── Inicializa Firebase ───────────
+if not firebase_admin._apps:
+    cred = credentials.Certificate("serviceAccountKey.json")  # arquivo da service-account
+    firebase_admin.initialize_app(cred, {
+        "databaseURL": "https://appweb-82f31-default-rtdb.firebaseio.com/"  # ajuste se seu URL for diferente
+    })
 
 app = Flask(__name__)
-app.secret_key = os.getenv("SECRET_KEY", "minha_chave_secreta_troque_depois")
 
-DB_PATH = "mensagens.db"
-UPLOAD_FOLDER = "static/uploads"
-ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+# ─────────── Funções Firebase (CRUD) ───────────
+def listar_clientes_firebase():
+    ref = db.reference("/clientes")
+    data = ref.get()
+    if data:
+        return [{**v, "id": k} for k, v in data.items()]
+    return []
 
-MODO_DESENVOLVIMENTO = True
-USERS = {"Lucia": "1234"}
+def adicionar_cliente_firebase(nome, telefone, placa, email):
+    ref = db.reference("/clientes")
+    ref.push({
+        "nome": nome,
+        "telefone": telefone,
+        "placa": placa,
+        "email": email
+    })
 
-# ---------- Firebase Storage ----------
-cred = credentials.Certificate('firebase.json')
-initialize_app(cred, {
-    'storageBucket': 'appweb-82f31'  # Nome exato do seu bucket
-})
+def buscar_cliente_firebase(cliente_id):
+    ref = db.reference(f"/clientes/{cliente_id}")
+    data = ref.get()
+    if data:
+        data["id"] = cliente_id
+        return data
+    return None
 
-def upload_file_to_firebase_storage(file_storage, cliente_nome):
-    if not file_storage or file_storage.filename == '':
-        return None
-    filename = secure_filename(file_storage.filename)
-    final_path = f"clientes/{cliente_nome}/{filename}"
-
-    bucket = storage.bucket()
-    blob = bucket.blob(final_path)
-    blob.upload_from_file(file_storage.stream, content_type=file_storage.content_type)
-    blob.make_public()
-    return blob.public_url
-
-def get_db_connection():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
-
-def criar_tabela_clientes():
-    conn = get_db_connection()
-    c = conn.cursor()
-    c.execute("""
-      CREATE TABLE IF NOT EXISTS clientes(
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          nome TEXT,
-          telefone TEXT,
-          placa TEXT,
-          endereco TEXT,
-          email TEXT,
-          foto_placa TEXT,
-          foto_dianteira TEXT,
-          foto_traseira TEXT,
-          foto_lado_esq TEXT,
-          foto_lado_dir TEXT,
-          foto_dano TEXT,
-          pasta_drive TEXT
-      );
-    """)
-    conn.commit()
-    conn.close()
-
-criar_tabela_clientes()
-
-def allowed(filename):
-    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
-
-def salvar_imagem(file_storage):
-    if not file_storage or file_storage.filename == "":
-        return None
-    if not allowed(file_storage.filename):
-        return None
-    nome_seguro = secure_filename(file_storage.filename)
-    unique = secrets.token_hex(4)
-    _, ext = os.path.splitext(nome_seguro)
-    final_name = f"{unique}{ext.lower()}"
-    caminho = os.path.join(UPLOAD_FOLDER, final_name)
-    file_storage.save(caminho)
-    return final_name
-# ---------- Autenticação ----------
-@app.before_request
-def proteger_rotas():
-    if MODO_DESENVOLVIMENTO:
-        return
-    rotas_livres = ("/login", "/static/")
-    if not session.get("user") and not request.path.startswith(rotas_livres):
-        return redirect(url_for("login"))
-
-@app.route("/login", methods=["GET", "POST"])
-def login():
-    if MODO_DESENVOLVIMENTO:
-        session["user"] = "dev"
-        return redirect(url_for("home"))
-    msg = ""
-    if request.method == "POST":
-        u, p = request.form["user"], request.form["pwd"]
-        if USERS.get(u) == p:
-            session["user"] = u
-            return redirect(url_for("home"))
-        msg = "Usuário ou senha inválidos"
-    return render_template("login.html", msg=msg)
-
-@app.route("/logout")
-def logout():
-    session.clear()
-    return redirect(url_for("login"))
-
-# ---------- Páginas Base ----------
+# ─────────── Rotas Flask ───────────
 @app.route("/")
-def home():
+def index():
     return render_template("index.html")
 
-@app.route("/rastreamento")
-def rastreamento():
-    return render_template("rastreamento.html")
-
-@app.route("/bloqueio")
-def bloqueio():
-    return render_template("bloqueio.html")
-
-@app.route("/consulta")
-def consulta():
-    return render_template("consulta.html")
-
-@app.route("/orcamento")
-def orcamento():
-    return render_template("orcamento.html")
-
-# ---------- Lista com Filtro e Paginação ----------
 @app.route("/clientes")
 def clientes():
     busca = request.args.get("busca", "")
-    pagina = int(request.args.get("pagina", 1))
-    por_pagina = 10
-    offset = (pagina - 1) * por_pagina
+    clientes = listar_clientes_firebase()
+    if busca:
+        clientes = [c for c in clientes
+                    if busca.lower() in c["nome"].lower()
+                    or busca.lower() in c["placa"].lower()]
+    return render_template("clientes.html", clientes=clientes, busca=busca)
 
-    conn = get_db_connection()
-    total = conn.execute("""
-        SELECT COUNT(*) FROM clientes
-        WHERE nome LIKE ? OR placa LIKE ?
-    """, (f"%{busca}%", f"%{busca}%")).fetchone()[0]
+@app.route("/clientes/<cliente_id>")
+def visualizar_cliente(cliente_id):
+    cliente = buscar_cliente_firebase(cliente_id)
+    if not cliente:
+        return "<h1>Cliente não encontrado</h1>", 404
+    return (
+        f"<h1>Cliente: {cliente['nome']}</h1>"
+        f"<p>Telefone: {cliente['telefone']}<br>"
+        f"Placa: {cliente['placa']}<br>"
+        f"E-mail: {cliente['email']}</p>"
+    )
 
-    lista = conn.execute("""
-        SELECT * FROM clientes
-        WHERE nome LIKE ? OR placa LIKE ?
-        ORDER BY id DESC
-        LIMIT ? OFFSET ?
-    """, (f"%{busca}%", f"%{busca}%", por_pagina, offset)).fetchall()
-    conn.close()
-
-    total_paginas = (total // por_pagina) + (1 if total % por_pagina > 0 else 0)
-
-    return render_template("clientes.html", clientes=lista, busca=busca, pagina=pagina, total_paginas=total_paginas)
-
-# ---------- Novo Cliente ----------
 @app.route("/clientes/novo", methods=["GET", "POST"])
 def novo_cliente():
     if request.method == "POST":
-        dados = {k: request.form.get(k) for k in ("nome", "telefone", "placa", "endereco", "email")}
-
-        fotos_links = {}
-        for campo in ("foto_placa", "foto_dianteira", "foto_traseira", "foto_lado_esq", "foto_lado_dir", "foto_dano"):
-            file = request.files.get(campo)
-            link = upload_file_to_firebase_storage(file, dados["nome"]) if file else None
-            fotos_links[campo] = link
-
-        conn = get_db_connection()
-        conn.execute("""
-            INSERT INTO clientes
-            (nome, telefone, placa, endereco, email,
-             foto_placa, foto_dianteira, foto_traseira,
-             foto_lado_esq, foto_lado_dir, foto_dano, pasta_drive)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (
-            dados["nome"], dados["telefone"], dados["placa"], dados["endereco"], dados["email"],
-            fotos_links["foto_placa"], fotos_links["foto_dianteira"], fotos_links["foto_traseira"],
-            fotos_links["foto_lado_esq"], fotos_links["foto_lado_dir"], fotos_links["foto_dano"], None
-        ))
-        conn.commit()
-        conn.close()
-        flash("Cliente cadastrado com sucesso!", "success")
+        nome = request.form.get("nome")
+        telefone = request.form.get("telefone")
+        placa = request.form.get("placa")
+        email = request.form.get("email")
+        adicionar_cliente_firebase(nome, telefone, placa, email)
         return redirect(url_for("clientes"))
-
     return render_template("novo_cliente.html")
 
-# ---------- Editar Cliente ----------
-@app.route("/clientes/editar/<int:id>", methods=["GET", "POST"])
-def editar_cliente(id):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM clientes WHERE id=?", (id,))
-    cliente_atual = cursor.fetchone()
-
-    if request.method == "POST":
-        dados = {k: request.form.get(k) for k in ("nome", "telefone", "placa", "endereco", "email")}
-
-        fotos = {}
-        for campo in ("foto_placa", "foto_dianteira", "foto_traseira", "foto_lado_esq", "foto_lado_dir", "foto_dano"):
-            file = request.files.get(campo)
-            if file and file.filename != "":
-                link = upload_file_to_firebase_storage(file, dados["nome"])
-                fotos[campo] = link
-            else:
-                fotos[campo] = cliente_atual[campo]
-
-        cursor.execute("""
-            UPDATE clientes
-               SET nome=?, telefone=?, placa=?, endereco=?, email=?,
-                   foto_placa=?, foto_dianteira=?, foto_traseira=?,
-                   foto_lado_esq=?, foto_lado_dir=?, foto_dano=?, pasta_drive=?
-             WHERE id=?
-        """, (
-            dados["nome"], dados["telefone"], dados["placa"], dados["endereco"], dados["email"],
-            fotos["foto_placa"], fotos["foto_dianteira"], fotos["foto_traseira"],
-            fotos["foto_lado_esq"], fotos["foto_lado_dir"], fotos["foto_dano"], None, id
-        ))
-        conn.commit()
-        conn.close()
-        flash("Cliente atualizado com sucesso!", "success")
-        return redirect(url_for("clientes"))
-
-    conn.close()
-    return render_template("editar_cliente.html", cliente=cliente_atual)
-# ---------- Excluir Cliente ----------
-@app.route("/clientes/excluir/<int:id>")
-def excluir_cliente(id):
-    conn = get_db_connection()
-    conn.execute("DELETE FROM clientes WHERE id=?", (id,))
-    conn.commit()
-    conn.close()
-    flash("Cliente removido com sucesso.", "info")
-    return redirect(url_for("clientes"))
-
-# ---------- Visualizar Cliente ----------
-@app.route("/clientes/<int:id>")
-def visualizar_cliente(id):
-    conn = get_db_connection()
-    cliente = conn.execute("SELECT * FROM clientes WHERE id=?", (id,)).fetchone()
-    conn.close()
-
-    if not cliente:
-        flash("Cliente não encontrado.", "warning")
-        return redirect(url_for("clientes"))
-
-    return render_template("visualizar_cliente.html", cliente=cliente)
-
-# ---------- Exportar CSV Geral ----------
-@app.route("/clientes/exportar")
-def exportar_clientes():
-    conn = get_db_connection()
-    clientes = conn.execute("SELECT * FROM clientes ORDER BY id DESC").fetchall()
-    conn.close()
-
-    caminho_csv = "clientes_export.csv"
-    with open(caminho_csv, mode="w", newline="", encoding="utf-8") as arquivo:
-        writer = csv.writer(arquivo)
-        writer.writerow([
-            "ID", "Nome", "Telefone", "Placa", "Endereço", "Email",
-            "Foto Placa", "Foto Dianteira", "Foto Traseira",
-            "Foto Lado Esq", "Foto Lado Dir", "Foto Dano"
-        ])
-        for c in clientes:
-            writer.writerow([
-                c["id"], c["nome"], c["telefone"], c["placa"], c["endereco"], c["email"],
-                c["foto_placa"], c["foto_dianteira"], c["foto_traseira"],
-                c["foto_lado_esq"], c["foto_lado_dir"], c["foto_dano"]
-            ])
-    return send_file(caminho_csv, as_attachment=True)
-
-# ---------- Exportar PDF de Todos ----------
-@app.route("/clientes/exportar_pdf_todos")
-def exportar_todos_clientes_pdf():
-    conn = get_db_connection()
-    clientes = conn.execute("SELECT * FROM clientes ORDER BY id DESC").fetchall()
-    conn.close()
-
-    caminho_pdf = "clientes_lista.pdf"
-    c = canvas.Canvas(caminho_pdf, pagesize=letter)
-    c.setFont("Helvetica", 11)
-    largura, altura = letter
-    y = altura - 40
-
-    for cliente in clientes:
-        c.drawString(50, y, f"ID: {cliente['id']} – Nome: {cliente['nome']}")
-        y -= 16
-        c.drawString(60, y, f"Telefone: {cliente['telefone']}")
-        y -= 16
-        c.drawString(60, y, f"Placa: {cliente['placa']}")
-        y -= 16
-        c.drawString(60, y, f"E-mail: {cliente['email']}")
-        y -= 20
-        if y < 80:
-            c.showPage()
-            y = altura - 40
-
-    c.save()
-    return send_file(caminho_pdf, as_attachment=True)
-
-# ---------- WhatsApp Rápido ----------
-@app.route("/clientes/whatsapp/<int:id>")
-def enviar_whatsapp_cliente(id):
-    conn = get_db_connection()
-    cliente = conn.execute("SELECT * FROM clientes WHERE id=?", (id,)).fetchone()
-    conn.close()
-
-    if not cliente:
-        flash("Cliente não encontrado.", "warning")
-        return redirect(url_for("clientes"))
-
-    telefone = cliente['telefone']
-    texto = f"Olá {cliente['nome']}, sua ficha está disponível na Oficina SMHITE."
-    numero_destino = "55" + telefone.strip().replace(" ", "").replace("-", "")
-
-    try:
-        service = Service('chromedriver.exe')
-        options = webdriver.ChromeOptions()
-        options.add_argument(r"--user-data-dir=selenium")
-        driver = webdriver.Chrome(service=service, options=options)
-
-        driver.get(f"https://web.whatsapp.com/send?phone={numero_destino}&text={texto.replace(' ', '%20')}")
-        time.sleep(15)
-        botao = driver.find_element(By.XPATH, '//span[@data-icon="send"]')
-        botao.click()
-        time.sleep(5)
-        driver.quit()
-        flash("Mensagem enviada via WhatsApp!", "success")
-    except Exception as e:
-        print(f"Erro WhatsApp: {e}")
-        flash(f"Erro ao enviar WhatsApp: {e}", "danger")
-
-    return redirect(url_for("visualizar_cliente", id=id))
-
-# ---------- Executar Flask ----------
+# ─────────── Run ───────────
 if __name__ == "__main__":
     app.run(debug=True)

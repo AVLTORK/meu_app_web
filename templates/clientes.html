@@ -1,73 +1,132 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Clientes – Oficina SMHITE</title>
+    <title>Clientes - Mecânica SMHITE</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f2f4f8; padding: 20px; }
-        h1 { color: #3f65a4; }
-        .btn-novo, .btn-export { margin-right: 10px; padding: 8px 14px; background: #4caf50; color: white; border-radius: 6px; text-decoration: none; }
-        .btn-novo:hover, .btn-export:hover { background: #45a047; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-        th { background: #3f65a4; color: white; }
-        .paginacao a { margin: 0 8px; text-decoration: none; }
+        body {
+            background: #1976d2;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: #fff;
+            color: #222;
+            border-radius: 18px;
+            padding: 32px 32px 20px 32px;
+            box-shadow: 0 4px 24px #2223;
+        }
+        h1 {
+            text-align: center;
+            color: #1976d2;
+            font-weight: 300;
+        }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+        .busca {
+            flex: 1;
+            margin-right: 18px;
+        }
+        .busca input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #aaa;
+            font-size: 1.1rem;
+        }
+        .btn-adicionar {
+            background: #1976d2;
+            color: #fff;
+            padding: 13px 32px;
+            border-radius: 9px;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 8px #1976d288;
+            transition: background 0.2s;
+        }
+        .btn-adicionar:hover {
+            background: #1565c0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 18px;
+        }
+        th, td {
+            padding: 10px 8px;
+            text-align: left;
+        }
+        th {
+            background: #1976d2;
+            color: #fff;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background: #f3f7fa;
+        }
+        tr:nth-child(odd) {
+            background: #e1e9f4;
+        }
+        .acao {
+            text-align: center;
+        }
+        .acao a {
+            color: #1976d2;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .acao a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
-
-    <h1>Lista de Clientes</h1>
-
-    <!-- Busca -->
-    <form method="get" action="{{ url_for('clientes') }}" style="margin-bottom: 20px;">
-        <input type="text" name="busca" placeholder="Buscar por nome ou placa..." value="{{ busca }}" style="padding: 8px; width: 250px;">
-        <button type="submit" style="padding: 8px 12px;">🔍 Buscar</button>
-    </form>
-
-    <!-- Botões -->
-    <a class="btn-novo" href="{{ url_for('novo_cliente') }}">+ Novo Cliente</a>
-    <a class="btn-export" href="{{ url_for('exportar_todos_clientes_pdf') }}">📄 Exportar PDF Geral</a>
-    <a class="btn-export" href="{{ url_for('exportar_clientes') }}">🗂️ Exportar CSV Geral</a>
-    <a class="btn-export" href="{{ url_for('exportar_clientes_pdf_filtrado', busca=busca) }}">🔎 Exportar PDF Filtrado</a>
-    <a class="btn-export" href="{{ url_for('exportar_clientes_filtrados', busca=busca) }}">🔎 Exportar CSV Filtrado</a>
-    <a class="btn-export" href="{{ url_for('relatorios_clientes') }}">📊 Relatórios</a>
-
-    <!-- Tabela -->
-    <table>
-        <tr>
-            <th>ID</th>
-            <th>Nome</th>
-            <th>Telefone</th>
-            <th>Placa</th>
-            <th>Ações</th>
-        </tr>
-        {% for cliente in clientes %}
-        <tr>
-            <td>{{ cliente["id"] }}</td>
-            <td>{{ cliente["nome"] }}</td>
-            <td>{{ cliente["telefone"] }}</td>
-            <td>{{ cliente["placa"] }}</td>
-            <td>
-                <a href="{{ url_for('visualizar_cliente', id=cliente['id']) }}">👁️ Ver</a> |
-                <a href="{{ url_for('editar_cliente', id=cliente['id']) }}">✏️ Editar</a> |
-                <a href="{{ url_for('excluir_cliente', id=cliente['id']) }}" onclick="return confirm('Excluir este cliente?')">❌ Excluir</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
-
-    <!-- Paginação -->
-    <div class="paginacao" style="margin-top: 20px;">
-        {% if pagina > 1 %}
-            <a href="{{ url_for('clientes', pagina=pagina-1, busca=busca) }}">⬅️ Anterior</a>
-        {% endif %}
-
-        <span>Página {{ pagina }} de {{ total_paginas }}</span>
-
-        {% if pagina < total_paginas %}
-            <a href="{{ url_for('clientes', pagina=pagina+1, busca=busca) }}">Próxima ➡️</a>
-        {% endif %}
+    <div class="container">
+        <h1>Clientes</h1>
+        <div class="top-bar">
+            <form class="busca" method="get" action="{{ url_for('clientes') }}">
+                <input type="text" name="busca" placeholder="Buscar cliente por nome ou placa" value="{{ busca or '' }}">
+            </form>
+            <a href="{{ url_for('novo_cliente') }}" class="btn-adicionar">Adicionar Cliente</a>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Telefone</th>
+                    <th>Placa</th>
+                    <th>Email</th>
+                    <th class="acao">Ver</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cliente in clientes %}
+                <tr>
+                    <td>{{ cliente.nome }}</td>
+                    <td>{{ cliente.telefone }}</td>
+                    <td>{{ cliente.placa }}</td>
+                    <td>{{ cliente.email }}</td>
+                    <td class="acao">
+                        <a href="{{ url_for('visualizar_cliente', cliente_id=cliente.id) }}">Detalhes</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" style="text-align:center;">Nenhum cliente cadastrado.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
-
 </body>
 </html>

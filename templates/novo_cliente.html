@@ -1,63 +1,95 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Novo Cliente – Oficina SMHITE</title>
+    <title>Novo Cliente - Mecânica SMHITE</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f2f4f8; padding: 20px; }
-        h1 { color: #3f65a4; }
-        label { display: block; margin-top: 12px; }
-        input, textarea { width: 100%; padding: 8px; margin-top: 4px; border-radius: 6px; border: 1px solid #ccc; }
-        button { margin-top: 20px; padding: 10px 16px; background: #4caf50; color: white; border: none; border-radius: 6px; cursor: pointer; }
-        button:hover { background: #45a047; }
-        .photos-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-top: 20px; }
-        .photo-card { border: 2px dashed #c4cbdc; border-radius: 10px; padding: 20px; text-align: center; background: #fff; }
-        input[type="file"] { margin-top: 8px; }
-        a { display: inline-block; margin-top: 20px; color: #3f65a4; text-decoration: none; }
-        a:hover { text-decoration: underline; }
+        body {
+            background: #1976d2;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            max-width: 500px;
+            margin: 48px auto;
+            background: #fff;
+            color: #222;
+            border-radius: 18px;
+            padding: 36px 32px 20px 32px;
+            box-shadow: 0 4px 24px #2223;
+        }
+        h1 {
+            text-align: center;
+            color: #1976d2;
+            font-weight: 300;
+            margin-bottom: 36px;
+        }
+        label {
+            display: block;
+            margin: 12px 0 6px 0;
+            font-weight: bold;
+            color: #1976d2;
+        }
+        input[type="text"], input[type="email"] {
+            width: 100%;
+            padding: 11px;
+            border-radius: 7px;
+            border: 1px solid #aaa;
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+        }
+        .botoes {
+            margin-top: 28px;
+            text-align: right;
+        }
+        .btn {
+            background: #1976d2;
+            color: #fff;
+            padding: 12px 30px;
+            border-radius: 9px;
+            border: none;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: background 0.2s;
+        }
+        .btn:hover {
+            background: #1565c0;
+        }
+        .voltar {
+            background: #eee;
+            color: #1976d2;
+            border: 1px solid #1976d2;
+        }
+        .voltar:hover {
+            background: #f0f4fa;
+        }
     </style>
 </head>
 <body>
+    <div class="container">
+        <h1>Novo Cliente</h1>
+        <form method="post">
+            <label for="nome">Nome:</label>
+            <input type="text" name="nome" id="nome" required>
 
-    <h1>Novo Cliente</h1>
+            <label for="telefone">Telefone:</label>
+            <input type="text" name="telefone" id="telefone" required>
 
-    <form method="post" enctype="multipart/form-data">
-        <label>Nome:</label>
-        <input type="text" name="nome" required>
+            <label for="placa">Placa:</label>
+            <input type="text" name="placa" id="placa" required>
 
-        <label>Telefone:</label>
-        <input type="text" name="telefone" required>
+            <label for="email">E-mail:</label>
+            <input type="email" name="email" id="email">
 
-        <label>Placa:</label>
-        <input type="text" name="placa">
-
-        <label>Endereço:</label>
-        <input type="text" name="endereco">
-
-        <label>Email:</label>
-        <input type="email" name="email">
-
-        <h3>Fotos:</h3>
-        <div class="photos-grid">
-            {% for campo, label in {
-                'foto_placa':'Placa',
-                'foto_dianteira':'Dianteira',
-                'foto_traseira':'Traseira',
-                'foto_lado_esq':'Lado Esquerdo',
-                'foto_lado_dir':'Lado Direito',
-                'foto_dano':'Dano/Defeito'
-            }.items() %}
-                <div class="photo-card">
-                    <label>{{ label }}</label>
-                    <input type="file" name="{{ campo }}" accept="image/*">
-                </div>
-            {% endfor %}
-        </div>
-
-        <button type="submit">Salvar Cliente</button>
-    </form>
-
-    <a href="{{ url_for('clientes') }}">← Voltar para Lista</a>
-
+            <div class="botoes">
+                <a href="{{ url_for('clientes') }}" class="btn voltar">Voltar</a>
+                <button type="submit" class="btn">Salvar</button>
+            </div>
+        </form>
+    </div>
 </body>
 </html>

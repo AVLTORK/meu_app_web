@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+env/
+venv/
+.venv/
+
+# VSCode / IDEs
+.vscode/
+.idea/
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Credenciais (mantém seu JSON fora de um repo público; se o repo for privado, comente a linha abaixo)
+# serviceAccountKey.json
