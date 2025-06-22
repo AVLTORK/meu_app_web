@@ -1,3 +1,5 @@
+from dotenv import load_dotenv
+load_dotenv()
 from flask import Flask, render_template, request, redirect, url_for, session, flash, send_file
 import os, sqlite3, secrets, csv, time, zipfile, requests
 from werkzeug.utils import secure_filename
@@ -24,7 +26,7 @@ MODO_DESENVOLVIMENTO = True
 USERS = {"Lucia": "1234"}
 
 # ---------- Google Drive ----------
-CREDENTIALS_FILE = 'd3ef615b-c531-4c46-8a0f-616b4c1ee58c.json'
+CREDENTIALS_FILE = '0e0beecf-f561-49d0-9dd8-737faf57234c.json'
 TOKEN_FILE = 'token.json'
 SCOPES = ['https://www.googleapis.com/auth/drive.file']
 
